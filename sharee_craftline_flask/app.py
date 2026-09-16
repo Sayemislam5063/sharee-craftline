@@ -312,20 +312,72 @@ def admin_logout():
 @admin_required
 def admin_dashboard():
     conn = db()
-    categories = [dict(r) for r in conn.execute('SELECT * FROM categories ORDER BY name').fetchall()]
-    products = [serialize_product(r) for r in conn.execute('SELECT * FROM products ORDER BY created_at DESC').fetchall()]
-    orders = [dict(r) for r in conn.execute('SELECT * FROM orders ORDER BY created_at DESC').fetchall()]
+
+    categories = [
+        dict(r)
+        for r in conn.execute(
+            'SELECT * FROM categories ORDER BY name'
+        ).fetchall()
+    ]
+
+    products = [
+        serialize_product(r)
+        for r in conn.execute(
+            'SELECT * FROM products ORDER BY created_at DESC'
+        ).fetchall()
+    ]
+
+    orders = [
+        dict(r)
+        for r in conn.execute(
+            'SELECT * FROM orders ORDER BY created_at DESC'
+        ).fetchall()
+    ]
+
+    # কোন product Edit করা হচ্ছে
+    edit_product_id = request.args.get('edit_product')
+    edit_product = None
+
+    if edit_product_id:
+        row = conn.execute(
+            'SELECT * FROM products WHERE id=?',
+            (edit_product_id,)
+        ).fetchone()
+
+        if row:
+            edit_product = serialize_product(row)
+
     stats = {
         'products': len(products),
         'categories': len(categories),
         'orders': len(orders),
-        'revenue': sum(float(o['total_price']) for o in orders if o['status'] not in ('cancelled',)),
-        'low_stock': sum(1 for p in products if int(p['stock']) <= 3),
+        'revenue': sum(
+            float(o['total_price'])
+            for o in orders
+            if o['status'] not in ('cancelled',)
+        ),
+        'low_stock': sum(
+            1 for p in products
+            if int(p['stock']) <= 3
+        ),
     }
-    conn.close()
-    category_map = {c['id']: c['name'] for c in categories}
-    return render_template('admin.html', categories=categories, products=products, orders=orders, stats=stats, category_map=category_map)
 
+    conn.close()
+
+    category_map = {
+        c['id']: c['name']
+        for c in categories
+    }
+
+    return render_template(
+        'admin.html',
+        categories=categories,
+        products=products,
+        orders=orders,
+        stats=stats,
+        category_map=category_map,
+        edit_product=edit_product
+    )
 
 @app.post('/admin/category/save')
 @admin_required
