@@ -9,7 +9,7 @@ from pathlib import Path
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from werkzeug.utils import secure_filename
 
-BASE_DIR = Path(**file**).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / 'instance' / 'store.db'
 UPLOAD_DIR = BASE_DIR / 'static' / 'uploads'
 
