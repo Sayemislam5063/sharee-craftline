@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} — Sharee Craftline{% endblock %}
+{% block content %}
+<section class="page-head glass-panel"><a class="back-link" href="{{ url_for('home') }}">← ফিরে যান</a><small>COLLECTION</small><h1>{{ category.name }}</h1><p>{{ category.description }}</p></section>
+<section class="catalog-section"><div class="catalog-grid">{% for p in products %}<article class="product-card glass-card"><a class="product-image" href="{{ url_for('product_page', product_id=p.id) }}">{% if p.offer_price is not none %}<span class="offer-badge">অফার</span>{% endif %}{% if p.images %}<img src="{{ url_for('static', filename=p.images[0]) }}" alt="{{ p.name }}">{% else %}<div class="image-placeholder">SC</div>{% endif %}</a><div class="product-body"><h3>{{ p.name }}</h3><div class="product-bottom"><span class="price">৳{{ '%.0f'|format(p.offer_price if p.offer_price is not none else p.price) }}</span>{% if p.stock > 0 %}<a class="small-btn" href="{{ url_for('product_page', product_id=p.id) }}">বেছে নিন</a>{% else %}<span class="sold-out">Sold Out</span>{% endif %}</div></div></article>{% else %}<div class="empty-state">এই ক্যাটাগরিতে কোনো প্রোডাক্ট নেই।</div>{% endfor %}</div></section>
+{% endblock %}

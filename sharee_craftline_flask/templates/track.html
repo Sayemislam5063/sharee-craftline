@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block title %}Order Tracking — Sharee Craftline{% endblock %}
+{% block content %}<section class="tracking-page glass-panel"><div class="section-head center"><small>ORDER TRACKING</small><h1>আপনার অর্ডার কোথায়?</h1><p>Tracking ID দিয়ে বর্তমান স্ট্যাটাস দেখুন।</p></div><form id="trackForm" class="track-form"><input id="trackingIdInput" placeholder="যেমন SC-260914123456-ABCDE" required><button class="solid-btn" type="submit">Track Order</button></form><div id="trackResult" class="track-result"></div></section>{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/track.js') }}"></script>{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — Sharee Craftline{% endblock %}
+{% block content %}
+<section class="product-page glass-panel"><div class="product-gallery"><div class="main-product-image" id="mainImage">{% if product.images %}<img src="{{ url_for('static', filename=product.images[0]) }}" alt="{{ product.name }}">{% else %}<div class="image-placeholder">SC</div>{% endif %}</div><div class="thumb-row">{% for img in product.images %}<button type="button" class="thumb" data-src="{{ url_for('static', filename=img) }}"><img src="{{ url_for('static', filename=img) }}" alt=""></button>{% endfor %}</div></div>
+<div class="product-detail"><small>SHAREE CRAFTLINE</small><h1>{{ product.name }}</h1><p class="detail-desc">{{ product.description }}</p><div class="detail-price">{% if product.offer_price is not none %}<del>৳{{ '%.0f'|format(product.price) }}</del> <strong>৳{{ '%.0f'|format(product.offer_price) }}</strong>{% else %}<strong>৳{{ '%.0f'|format(product.price) }}</strong>{% endif %}</div><div class="stock-line">{% if product.stock > 0 %}স্টকে আছে ({{ product.stock }} টি){% else %}Sold Out{% endif %}</div>
+{% if product.colors %}<div class="option-block"><label>রঙ বেছে নিন</label><div class="option-row" id="colorOptions">{% for c in product.colors %}<button type="button" data-value="{{ c }}" class="option-chip {% if loop.first %}selected{% endif %}">{{ c }}</button>{% endfor %}</div></div>{% endif %}
+{% if product.has_blouse_option %}<div class="option-block"><label>ব্লাউজ পিস</label><div class="option-row"><button type="button" class="option-chip selected" data-blouse="with">সহ</button><button type="button" class="option-chip" data-blouse="without">ছাড়া</button></div></div>{% endif %}
+<div class="qty-row"><button type="button" id="qtyMinus">−</button><span id="qtyValue">1</span><button type="button" id="qtyPlus">+</button></div>
+<div class="product-actions"><button class="solid-btn wide" id="addToCart" {% if product.stock <= 0 %}disabled{% endif %}>কার্টে যোগ করুন</button><button class="ghost-btn wide" id="buyNow" {% if product.stock <= 0 %}disabled{% endif %}>এখনই কিনুন</button></div></div></section>
+{% endblock %}
+{% block scripts %}<script>window.PRODUCT={{ product|tojson }};</script><script src="{{ url_for('static', filename='js/product.js') }}"></script>{% endblock %}

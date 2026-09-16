@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Sharee Craftline — Home{% endblock %}
+{% block content %}
+<section class="hero glass-panel">
+  <div class="hero-copy"><span class="eyebrow">CURATED SAREE COLLECTION</span><h1>শাড়ি, যেটা আপনার গল্পটাকে আরও সুন্দর করে।</h1><p>বাংলাদেশি ঐতিহ্য আর আধুনিক স্টাইলের মিলনে বেছে নিন আপনার পছন্দের শাড়ি।</p><div class="hero-actions"><a href="#collection" class="solid-btn">কালেকশন দেখুন</a><a href="{{ url_for('tracking') }}" class="ghost-btn">অর্ডার ট্র্যাক</a></div></div>
+  <div class="hero-card-stack"><div class="hero-orb"></div><div class="hero-mini-card"><span>SHAREE CRAFTLINE</span><strong>Elegant • Authentic</strong></div></div>
+</section>
+
+<section class="best-wrap glass-panel maroon-panel">
+  <div class="section-head center"><small>BEST SELLING</small><h2>জনপ্রিয় পছন্দ</h2></div>
+  <div class="slider" id="bestSlider">
+    {% for p in products[:8] %}
+      <article class="slider-card {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
+        <div class="product-image tall">{% if p.images %}<img src="{{ url_for('static', filename=p.images[0]) }}" alt="{{ p.name }}">{% else %}<div class="image-placeholder">SC</div>{% endif %}</div>
+        <div class="product-body"><small>BEST SELLING</small><h3>{{ p.name }}</h3><strong>{% if p.offer_price is not none %}৳{{ '%.0f'|format(p.offer_price) }}{% else %}৳{{ '%.0f'|format(p.price) }}{% endif %}</strong><a class="small-btn" href="{{ url_for('product_page', product_id=p.id) }}">বেছে নিন</a></div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="collection" class="collection-section">
+  <div class="section-head center"><small>OUR COLLECTION</small><h2>আমাদের কালেকশন</h2><div class="accent-line"></div></div>
+  <div class="category-row" id="categoryRow">
+    {% for c in categories %}<a href="{{ url_for('category_page', category_id=c.id) }}" class="category-bubble"><div class="bubble-img">{% if c.image %}<img src="{{ url_for('static', filename=c.image) }}" alt="{{ c.name }}">{% else %}<span>{{ c.name[:1] }}</span>{% endif %}</div><span>{{ c.name }}</span></a>{% endfor %}
+  </div>
+
+  <div id="catalogGrid" class="catalog-grid">
+    {% for p in products %}
+      <article class="product-card glass-card" data-category="{{ p.category_id or '' }}" data-price="{{ p.offer_price if p.offer_price is not none else p.price }}">
+        <a href="{{ url_for('product_page', product_id=p.id) }}" class="product-image">{% if p.offer_price is not none %}<span class="offer-badge">অফার</span>{% endif %}{% if p.images %}<img src="{{ url_for('static', filename=p.images[0]) }}" alt="{{ p.name }}" loading="lazy">{% else %}<div class="image-placeholder">SC</div>{% endif %}</a>
+        <div class="product-body"><small>{{ category_map.get(p.category_id, 'Collection') }}</small><h3>{{ p.name }}</h3><p>{{ p.description }}</p><div class="product-bottom"><div><span class="price">৳{{ '%.0f'|format(p.offer_price if p.offer_price is not none else p.price) }}</span>{% if p.offer_price is not none %}<del>৳{{ '%.0f'|format(p.price) }}</del>{% endif %}</div>{% if p.stock > 0 %}<a class="small-btn" href="{{ url_for('product_page', product_id=p.id) }}">বেছে নিন</a>{% else %}<span class="sold-out">Sold Out</span>{% endif %}</div></div>
+      </article>
+    {% else %}<div class="empty-state">এখনো কোনো প্রোডাক্ট যোগ করা হয়নি।</div>{% endfor %}
+  </div>
+</section>
+{% endblock %}
