@@ -16,7 +16,7 @@ UPLOAD_DIR = BASE_DIR / 'static' / 'uploads'
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-app = Flask(**name**)
+app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'change-this-secret-key')
 app.config['MAX_CONTENT_LENGTH'] = 12 * 1024 * 1024
 
