@@ -1,41 +1,80 @@
 {% extends 'base.html' %}
+
 {% block title %}Admin — Sharee Craftline{% endblock %}
+
 {% block content %}
 
 <section class="admin-page">
 
 <div class="admin-top">
-    <div>
-        <small>ADMIN CONTROL CENTER</small>
-        <h1>Sharee Craftline Admin</h1>
-    </div>
-    <a class="ghost-btn" href="{{ url_for('admin_logout') }}">Logout</a>
+
+```
+<div>
+    <small>ADMIN CONTROL CENTER</small>
+    <h1>Sharee Craftline Admin</h1>
 </div>
 
+<a class="ghost-btn"
+   href="{{ url_for('admin_logout') }}">
+    Logout
+</a>
+```
+
+</div>
+
+<!-- ================= STATS ================= -->
+
 <div class="stats-grid">
-    <div class="stat-card"><small>PRODUCTS</small><strong>{{ stats.products }}</strong></div>
-    <div class="stat-card"><small>CATEGORIES</small><strong>{{ stats.categories }}</strong></div>
-    <div class="stat-card"><small>ORDERS</small><strong>{{ stats.orders }}</strong></div>
-    <div class="stat-card"><small>REVENUE</small><strong>৳{{ '%.0f'|format(stats.revenue) }}</strong></div>
-    <div class="stat-card"><small>LOW STOCK</small><strong>{{ stats.low_stock }}</strong></div>
+
+```
+<div class="stat-card">
+    <small>PRODUCTS</small>
+    <strong>{{ stats.products }}</strong>
+</div>
+
+<div class="stat-card">
+    <small>CATEGORIES</small>
+    <strong>{{ stats.categories }}</strong>
+</div>
+
+<div class="stat-card">
+    <small>ORDERS</small>
+    <strong>{{ stats.orders }}</strong>
+</div>
+
+<div class="stat-card">
+    <small>REVENUE</small>
+    <strong>
+        ৳{{ '%.0f'|format(stats.revenue) }}
+    </strong>
+</div>
+
+<div class="stat-card">
+    <small>LOW STOCK</small>
+    <strong>{{ stats.low_stock }}</strong>
+</div>
+```
+
 </div>
 
 <div class="admin-grid">
 
-<!-- CATEGORY -->
+<!-- ================= CATEGORY ================= -->
 
 <section class="admin-card glass-card">
-    <div class="admin-card-head">
-        <h2>Category</h2>
-    </div>
 
 ```
+<div class="admin-card-head">
+    <h2>Category</h2>
+</div>
+
 <form action="{{ url_for('admin_category_save') }}"
       method="post"
       enctype="multipart/form-data"
       class="admin-form">
 
-    <input type="hidden" name="id">
+    <input type="hidden"
+           name="id">
 
     <input name="name"
            placeholder="Category name"
@@ -48,40 +87,54 @@
            name="image"
            accept="image/*">
 
-    <button class="solid-btn" type="submit">
+    <button class="solid-btn"
+            type="submit">
         Add Category
     </button>
+
 </form>
 
+
 <div class="admin-list">
+
     {% for c in categories %}
+
     <div class="admin-row">
+
         <div>
             <strong>{{ c.name }}</strong>
             <small>{{ c.description }}</small>
         </div>
 
-        <form action="{{ url_for('admin_category_delete', category_id=c.id) }}"
+        <form action="{{ url_for(
+                    'admin_category_delete',
+                    category_id=c.id
+                ) }}"
               method="post">
 
-            <button class="danger-btn" type="submit">
+            <button class="danger-btn"
+                    type="submit">
                 Delete
             </button>
 
         </form>
+
     </div>
+
     {% endfor %}
+
 </div>
 ```
 
 </section>
 
-<!-- ADD / EDIT PRODUCT -->
+<!-- ================= PRODUCT FORM ================= -->
 
 <section class="admin-card glass-card">
 
 ```
 <div class="admin-card-head">
+
     <h2>
         {% if edit_product %}
             Edit Product
@@ -89,45 +142,64 @@
             Add Product
         {% endif %}
     </h2>
+
 </div>
+
 
 <form action="{{ url_for('admin_product_save') }}"
       method="post"
       enctype="multipart/form-data"
       class="admin-form">
 
-    <!-- Product ID -->
+
+    <!-- PRODUCT ID -->
+
     <input type="hidden"
            name="id"
            value="{{ edit_product.id if edit_product else '' }}">
 
-    <!-- Product Name -->
+
+    <!-- NAME -->
+
     <input name="name"
            placeholder="Product name"
            required
            value="{{ edit_product.name if edit_product else '' }}">
 
-    <!-- Category -->
+
+    <!-- CATEGORY -->
+
     <select name="category_id">
 
-        <option value="">No category</option>
+        <option value="">
+            No category
+        </option>
 
         {% for c in categories %}
+
         <option value="{{ c.id }}"
-            {% if edit_product and edit_product.category_id == c.id %}
+            {% if edit_product
+                  and edit_product.category_id == c.id %}
                 selected
             {% endif %}>
+
             {{ c.name }}
+
         </option>
+
         {% endfor %}
 
     </select>
 
-    <!-- Description -->
+
+    <!-- DESCRIPTION -->
+
     <textarea name="description"
               placeholder="Description">{{ edit_product.description if edit_product else '' }}</textarea>
 
-    <!-- Price / Stock -->
+
+    <!-- PRICE / OFFER / STOCK / COLORS -->
+
     <div class="form-grid">
 
         <input type="number"
@@ -137,11 +209,13 @@
                required
                value="{{ edit_product.price if edit_product else '' }}">
 
+
         <input type="number"
                name="offer_price"
                step="1"
                placeholder="Offer price"
-               value="{{ edit_product.offer_price if edit_product and edit_product.offer_price is not none else '' }}">
+               value="{% if edit_product and edit_product.offer_price is not none %}{{ edit_product.offer_price }}{% endif %}">
+
 
         <input type="number"
                name="stock"
@@ -150,6 +224,7 @@
                required
                value="{{ edit_product.stock if edit_product else '' }}">
 
+
         <input type="text"
                name="colors"
                placeholder="Colors, comma separated"
@@ -157,55 +232,168 @@
 
     </div>
 
-    <!-- Featured -->
+
+    <!-- FEATURED -->
+
     <label class="check">
+
         <input type="checkbox"
                name="featured"
-               {% if edit_product and edit_product.featured %}checked{% endif %}>
+               {% if edit_product and edit_product.featured %}
+                   checked
+               {% endif %}>
+
         Featured
+
     </label>
 
-    <!-- Blouse -->
+
+    <!-- BLOUSE -->
+
     <label class="check">
+
         <input type="checkbox"
                name="has_blouse"
-               {% if edit_product and edit_product.has_blouse_option %}checked{% endif %}>
+               {% if edit_product and edit_product.has_blouse_option %}
+                   checked
+               {% endif %}>
+
         Has blouse option
+
     </label>
 
-    <!-- Blouse Prices -->
+
+    <!-- BLOUSE PRICES -->
+
     <div class="form-grid">
 
         <input type="number"
                name="price_with_blouse"
                step="1"
                placeholder="With blouse price"
-               value="{{ edit_product.price_with_blouse if edit_product and edit_product.price_with_blouse is not none else '' }}">
+               value="{% if edit_product and edit_product.price_with_blouse is not none %}{{ edit_product.price_with_blouse }}{% endif %}">
+
 
         <input type="number"
                name="price_without_blouse"
                step="1"
                placeholder="Without blouse price"
-               value="{{ edit_product.price_without_blouse if edit_product and edit_product.price_without_blouse is not none else '' }}">
+               value="{% if edit_product and edit_product.price_without_blouse is not none %}{{ edit_product.price_without_blouse }}{% endif %}">
 
     </div>
 
 
-    <!-- Existing Images -->
+    <!-- ================= CURRENT IMAGES ================= -->
+
     {% if edit_product and edit_product.images %}
 
     <div class="existing-images">
 
-        <strong>Current Images</strong>
+        <h3>Product Images</h3>
+
+        <p>
+            প্রথম ছবিটি বর্তমানে Thumbnail।
+            যেকোনো ছবিকে Set Thumbnail করা যাবে।
+        </p>
+
 
         <div class="image-preview-grid">
 
             {% for img in edit_product.images %}
 
-            <div class="image-preview">
+            <div class="image-preview"
+                 style="position:relative;">
 
-                <img src="{{ url_for('static', filename=img) }}"
+                <img src="{{ url_for(
+                            'static',
+                            filename=img
+                        ) }}"
                      alt="Product image">
+
+
+                <!-- THUMBNAIL BADGE -->
+
+                {% if loop.first %}
+
+                <span style="
+                    position:absolute;
+                    top:8px;
+                    left:8px;
+                    padding:5px 9px;
+                    border-radius:20px;
+                    background:#111;
+                    color:#fff;
+                    font-size:12px;
+                ">
+                    Thumbnail
+                </span>
+
+                {% endif %}
+
+
+                <!-- IMAGE ACTIONS -->
+
+                <div style="
+                    display:flex;
+                    gap:6px;
+                    margin-top:8px;
+                    flex-wrap:wrap;
+                ">
+
+
+                    {% if not loop.first %}
+
+                    <!-- SET THUMBNAIL -->
+
+                    <form action="{{ url_for(
+                                'admin_product_set_thumbnail'
+                            ) }}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="product_id"
+                               value="{{ edit_product.id }}">
+
+                        <input type="hidden"
+                               name="image"
+                               value="{{ img }}">
+
+                        <button class="small-btn"
+                                type="submit">
+                            Set Thumbnail
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+                    <!-- DELETE IMAGE -->
+
+                    <form action="{{ url_for(
+                                'admin_product_image_delete'
+                            ) }}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="product_id"
+                               value="{{ edit_product.id }}">
+
+                        <input type="hidden"
+                               name="image"
+                               value="{{ img }}">
+
+                        <button class="danger-btn"
+                                type="submit"
+                                onclick="return confirm('এই image টি delete করতে চান?');">
+
+                            Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -213,8 +401,9 @@
 
         </div>
 
+
         <small>
-            নতুন ছবি দিলে পুরোনো ছবিগুলোও থাকবে।
+            নতুন image upload করলে পুরোনো image থাকবে।
         </small>
 
     </div>
@@ -222,33 +411,48 @@
     {% endif %}
 
 
-    <!-- New Images -->
+    <!-- ================= ADD NEW IMAGES ================= -->
+
+    <label>
+        Add New Images
+    </label>
+
     <input type="file"
            name="images"
            accept="image/*"
            multiple>
 
 
-    <!-- Buttons -->
+    <!-- ================= SAVE / UPDATE ================= -->
 
     {% if edit_product %}
 
-        <button class="solid-btn" type="submit">
+        <button class="solid-btn"
+                type="submit">
+
             Update Product
+
         </button>
+
 
         <a class="ghost-btn"
            href="{{ url_for('admin_dashboard') }}">
+
             Cancel Edit
+
         </a>
 
     {% else %}
 
-        <button class="solid-btn" type="submit">
+        <button class="solid-btn"
+                type="submit">
+
             Save Product
+
         </button>
 
     {% endif %}
+
 
 </form>
 ```
@@ -257,7 +461,7 @@
 
 </div>
 
-<!-- PRODUCTS -->
+<!-- ================= PRODUCTS ================= -->
 
 <section class="admin-card glass-card">
 
@@ -266,11 +470,13 @@
     <h2>Products</h2>
 </div>
 
+
 <div class="admin-table-wrap">
 
     <table class="admin-table">
 
         <thead>
+
             <tr>
                 <th>Product</th>
                 <th>Price</th>
@@ -278,7 +484,9 @@
                 <th>Category</th>
                 <th>Action</th>
             </tr>
+
         </thead>
+
 
         <tbody>
 
@@ -291,47 +499,84 @@
                 <div class="table-product">
 
                     {% if p.images %}
-                    <img src="{{ url_for('static', filename=p.images[0]) }}"
+
+                    <img src="{{ url_for(
+                                'static',
+                                filename=p.images[0]
+                            ) }}"
                          alt="">
+
                     {% endif %}
 
-                    <span>{{ p.name }}</span>
+                    <span>
+                        {{ p.name }}
+                    </span>
 
                 </div>
 
             </td>
 
+
             <td>
+
                 ৳{{ '%.0f'|format(
                     p.offer_price
                     if p.offer_price is not none
                     else p.price
                 ) }}
+
             </td>
+
 
             <td class="{% if p.stock <= 3 %}low{% endif %}">
+
                 {{ p.stock }}
+
             </td>
 
+
             <td>
-                {{ category_map.get(p.category_id, '—') }}
+
+                {{ category_map.get(
+                    p.category_id,
+                    '—'
+                ) }}
+
             </td>
+
 
             <td>
 
                 <div class="product-actions">
 
+
+                    <!-- EDIT -->
+
                     <a class="small-btn"
-                       href="{{ url_for('admin_dashboard', edit_product=p.id) }}">
+                       href="{{ url_for(
+                           'admin_dashboard',
+                           edit_product=p.id
+                       ) }}">
+
                         Edit
+
                     </a>
 
-                    <form action="{{ url_for('admin_product_delete', product_id=p.id) }}"
+
+                    <!-- DELETE PRODUCT -->
+
+                    <form action="{{ url_for(
+                                'admin_product_delete',
+                                product_id=p.id
+                            ) }}"
                           method="post">
 
                         <button class="danger-btn"
-                                type="submit">
+                                type="submit"
+                                onclick="return confirm('পুরো product টি delete করতে চান?');">
+
                             Delete
+
                         </button>
 
                     </form>
@@ -353,7 +598,7 @@
 
 </section>
 
-<!-- ORDERS -->
+<!-- ================= ORDERS ================= -->
 
 <section class="admin-card glass-card">
 
@@ -362,11 +607,13 @@
     <h2>Orders</h2>
 </div>
 
+
 <div class="admin-table-wrap">
 
     <table class="admin-table">
 
         <thead>
+
             <tr>
                 <th>Tracking</th>
                 <th>Customer</th>
@@ -374,7 +621,9 @@
                 <th>Status</th>
                 <th>Update</th>
             </tr>
+
         </thead>
+
 
         <tbody>
 
@@ -382,43 +631,73 @@
 
         <tr>
 
-            <td>{{ o.tracking_id }}</td>
-
             <td>
-                {{ o.customer_name }}<br>
-                <small>{{ o.phone }}</small>
+                {{ o.tracking_id }}
             </td>
 
-            <td>
-                ৳{{ '%.0f'|format(o.total_price) }}
-            </td>
 
             <td>
+
+                {{ o.customer_name }}
+
+                <br>
+
+                <small>
+                    {{ o.phone }}
+                </small>
+
+            </td>
+
+
+            <td>
+
+                ৳{{ '%.0f'|format(
+                    o.total_price
+                ) }}
+
+            </td>
+
+
+            <td>
+
                 {{ o.status }}
+
             </td>
+
 
             <td>
 
-                <form action="{{ url_for('admin_order_status', tracking_id=o.tracking_id) }}"
+                <form action="{{ url_for(
+                            'admin_order_status',
+                            tracking_id=o.tracking_id
+                        ) }}"
                       method="post"
                       class="status-form">
+
 
                     <select name="status">
 
                         {% for s in order_statuses %}
 
                         <option value="{{ s }}"
-                            {% if s == o.status %}selected{% endif %}>
+                            {% if s == o.status %}
+                                selected
+                            {% endif %}>
+
                             {{ s }}
+
                         </option>
 
                         {% endfor %}
 
                     </select>
 
+
                     <button class="small-btn"
                             type="submit">
+
                         Save
+
                     </button>
 
                 </form>
