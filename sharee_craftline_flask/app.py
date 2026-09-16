@@ -41,9 +41,9 @@ ORDER_STATUSES = [
 # =========================================================
 
 def db():
-conn = sqlite3.connect(DB_PATH)
-conn.row_factory = sqlite3.Row
-return conn
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def init_db():
 conn = db()
