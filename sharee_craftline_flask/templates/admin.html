@@ -842,12 +842,21 @@
 
     if (!input || !preview) return;
 
-    input.addEventListener('change', function () {
+    // আলাদা আলাদা করে image select করলেও আগের image থাকবে
+    let selectedFiles = [];
+
+    function isSameFile(a, b) {
+        return (
+            a.name === b.name &&
+            a.size === b.size &&
+            a.lastModified === b.lastModified
+        );
+    }
+
+    function renderPreviews() {
         preview.innerHTML = '';
 
-        const files = Array.from(input.files || []);
-
-        files.forEach((file, index) => {
+        selectedFiles.forEach((file, index) => {
             if (!file.type.startsWith('image/')) return;
 
             const card = document.createElement('div');
@@ -881,8 +890,40 @@
                     : (index + 1) + ' — Additional Image';
 
             card.appendChild(number);
+
             preview.appendChild(card);
         });
+    }
+
+    input.addEventListener('change', function () {
+        const newlySelected = Array.from(input.files || []);
+
+        newlySelected.forEach(function (file) {
+            if (!file.type.startsWith('image/')) return;
+
+            const alreadyAdded = selectedFiles.some(function (oldFile) {
+                return isSameFile(oldFile, file);
+            });
+
+            if (!alreadyAdded) {
+                selectedFiles.push(file);
+            }
+        });
+
+        // Browser-এর file input-এ সব selected image আবার বসিয়ে দিচ্ছি
+        // যাতে form submit করার সময় সবগুলো একসাথে backend-এ যায়।
+        const dataTransfer = new DataTransfer();
+
+        selectedFiles.forEach(function (file) {
+            dataTransfer.items.add(file);
+        });
+
+        input.files = dataTransfer.files;
+
+        renderPreviews();
+
+        // একই file আবার select করার সুযোগ রাখে
+        input.value = '';
     });
 })();
 </script>
