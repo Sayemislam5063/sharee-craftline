@@ -413,14 +413,36 @@
 
     <!-- ================= ADD NEW IMAGES ================= -->
 
-    <label>
-        Add New Images
-    </label>
+    <div class="new-image-upload">
 
-    <input type="file"
-           name="images"
-           accept="image/*"
-           multiple>
+        <label>
+            {% if edit_product %}
+                Add More Images
+            {% else %}
+                Product Images
+            {% endif %}
+        </label>
+
+        <input
+            type="file"
+            id="productImagesInput"
+            name="images"
+            accept="image/*"
+            multiple
+        >
+
+        <small>
+            একসাথে একাধিক ছবি নির্বাচন করতে পারবে।
+            প্রথম ছবিটি Thumbnail হবে, পরের ছবিগুলো তার পরে থাকবে।
+        </small>
+
+        <div
+            id="newImagePreview"
+            class="image-preview-grid"
+            style="margin-top:14px;"
+        ></div>
+
+    </div>
 
 
     <!-- ================= SAVE / UPDATE ================= -->
@@ -718,5 +740,151 @@
 </section>
 
 </section>
+
+
+<style>
+.existing-images,
+.new-image-upload {
+    margin-top: 18px;
+    padding: 16px;
+    border: 1px solid rgba(110, 27, 50, 0.14);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.existing-images h3 {
+    margin: 0 0 6px;
+    color: var(--maroon-deep);
+}
+
+.existing-images p {
+    margin: 0 0 14px;
+    color: var(--maroon-soft);
+    font-size: 13px;
+}
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.image-preview {
+    overflow: hidden;
+    border: 1px solid rgba(110, 27, 50, 0.14);
+    border-radius: 14px;
+    background: #fff;
+    padding: 8px;
+}
+
+.image-preview img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f4eef0;
+}
+
+.new-image-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(110, 27, 50, 0.14);
+    border-radius: 14px;
+    background: #fff;
+    padding: 8px;
+}
+
+.new-image-card img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f4eef0;
+}
+
+.new-image-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #111;
+    color: #fff;
+    font-size: 12px;
+}
+
+.new-image-number {
+    margin-top: 8px;
+    text-align: center;
+    color: var(--maroon-soft);
+    font-size: 12px;
+}
+
+@media (max-width: 720px) {
+    .image-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .image-preview img,
+    .new-image-card img {
+        height: 145px;
+    }
+}
+</style>
+
+<script>
+(function () {
+    const input = document.getElementById('productImagesInput');
+    const preview = document.getElementById('newImagePreview');
+
+    if (!input || !preview) return;
+
+    input.addEventListener('change', function () {
+        preview.innerHTML = '';
+
+        const files = Array.from(input.files || []);
+
+        files.forEach((file, index) => {
+            if (!file.type.startsWith('image/')) return;
+
+            const card = document.createElement('div');
+            card.className = 'new-image-card';
+
+            if (index === 0) {
+                const badge = document.createElement('div');
+                badge.className = 'new-image-badge';
+                badge.textContent = 'Thumbnail';
+                card.appendChild(badge);
+            }
+
+            const img = document.createElement('img');
+            img.alt = file.name;
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                img.src = event.target.result;
+            };
+
+            reader.readAsDataURL(file);
+
+            card.appendChild(img);
+
+            const number = document.createElement('div');
+            number.className = 'new-image-number';
+            number.textContent =
+                index === 0
+                    ? '1 — Thumbnail'
+                    : (index + 1) + ' — Additional Image';
+
+            card.appendChild(number);
+            preview.appendChild(card);
+        });
+    });
+})();
+</script>
 
 {% endblock %}
